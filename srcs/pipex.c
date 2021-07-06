@@ -6,7 +6,7 @@
 /*   By: jkhong <jkhong@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/06 15:42:06 by jkhong            #+#    #+#             */
-/*   Updated: 2021/07/06 17:22:44 by jkhong           ###   ########.fr       */
+/*   Updated: 2021/07/06 17:27:39 by jkhong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -21,6 +21,16 @@
 		a. have it run multiple shell commands
 		b. incorporate redirection
 		c. consider error handling
+*/
+
+/*
+	Maybe handle errors in a separate function
+	include error handling to inform user insufficient inputs
+	if (argc < 3)
+	{
+		ft_putstr_fd("./pipex [file1] [cmd1] [cmd2] [file2]\n", 2);
+		return (1);
+	}
 */
 
 int	read_file()
@@ -47,16 +57,14 @@ int	main(int argc, char *argv[])
 		{
 			execve(path, args, NULL);
 		}
+		// included waitpid here just in case execve runs finish before freeing below
+		// if waitpid is not added, the sequence of runs will be off, i.e. the data will be freed before all executions
+		// We can also actually just use wait() instead, since we are only dealing with 1 fork at a single time
+		// waitpid helps if there are multiple forks running at the same time, where sequencing is important for us.
 		waitpid(pid, NULL, 0);
 		free_split(args);
 		free(path);
 		i++;
 	}
-	// include error handling to inform user insufficient inputs
-	// if (argc < 3)
-	// {
-	// 	ft_putstr_fd("./pipex [file1] [cmd1] [cmd2] [file2]\n", 2);
-	// 	return (1);
-	// }
 	return (0);
 }
