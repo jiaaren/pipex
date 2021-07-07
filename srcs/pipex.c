@@ -6,7 +6,7 @@
 /*   By: jkhong <jkhong@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/06 15:42:06 by jkhong            #+#    #+#             */
-/*   Updated: 2021/07/07 21:09:34 by jkhong           ###   ########.fr       */
+/*   Updated: 2021/07/07 21:27:35 by jkhong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,7 +68,7 @@ int	process_child(char *argv[], int dup_fd_r[2], int dup_fd_w[0], int count)
 		dup2(dup_fd_r[0], STDIN_FILENO);
 		close(dup_fd_r[0]);
 		close(dup_fd_w[1]);
-		execve(path, args, NULL);
+		execve(path, args, __environ);
 		ft_putstr_fd(args[0], 2);
 		ft_putstr_fd(": command not found\n", 2);
 		exit(127);
