@@ -6,11 +6,13 @@
 /*   By: jkhong <jkhong@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/06 15:42:06 by jkhong            #+#    #+#             */
-/*   Updated: 2021/07/08 00:15:18 by jkhong           ###   ########.fr       */
+/*   Updated: 2021/07/08 00:35:35 by jkhong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "libpipex_bonus.h"
+
+static char	**g_path;
 
 int	write_file(char *filename, int fd)
 {
@@ -54,13 +56,11 @@ void	read_file(char *filename, int dup_fd[2])
 int	process_child(char *argv[], int dup_fd_r[2], int dup_fd_w[2], int count)
 {
 	char	**args;
-	char	*path;
+	char	**paths;
 	int		pid;
 
 	args = ft_split(argv[count], ' ');
-	path = ft_strjoin("/bin/", args[0]);
-	free(args[0]);
-	args[0] = path;
+	paths = make_path(g_path, args[0]);
 	pid = fork();
 	if (pid == 0)
 	{
@@ -70,12 +70,13 @@ int	process_child(char *argv[], int dup_fd_r[2], int dup_fd_w[2], int count)
 		dup2(dup_fd_r[0], STDIN_FILENO);
 		close(dup_fd_r[0]);
 		close(dup_fd_w[1]);
-		execve(path, args, NULL);
+		exec_cmd(args, paths);
 		ft_putstr_fd(args[0], 2);
 		ft_putstr_fd(": command not found\n", 2);
 		exit(127);
 	}
 	ft_freesplit(args);
+	ft_freesplit(paths);
 	return (pid);
 }
 
@@ -107,7 +108,7 @@ int	cycle_cmd(int argc, char *argv[], int dup_fd_r[2], int dup_fd_w[2])
 	return (tmp_fd);
 }
 
-int	main(int argc, char *argv[])
+int	main(int argc, char *argv[], char *envp[])
 {
 	int		dup_fd_r[2];
 	int		dup_fd_w[2];
@@ -118,6 +119,7 @@ int	main(int argc, char *argv[])
 		ft_putstr_fd("./pipex [file1] [cmd1] [cmd2] ... [cmdn] [file2]\n", 2);
 		return (1);
 	}
+	g_path = split_path(envp);
 	pipe(dup_fd_r);
 	pipe(dup_fd_w);
 	read_file(argv[1], dup_fd_r);
@@ -125,5 +127,6 @@ int	main(int argc, char *argv[])
 	if (write_file(argv[argc - 1], tmp_fd) == -1)
 		close(tmp_fd);
 	close(tmp_fd);
+	ft_freesplit(g_path);
 	return (0);
 }

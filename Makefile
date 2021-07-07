@@ -6,18 +6,18 @@
 #    By: jkhong <jkhong@student.42kl.edu.my>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/07/06 15:42:02 by jkhong            #+#    #+#              #
-#    Updated: 2021/07/08 00:21:57 by jkhong           ###   ########.fr        #
+#    Updated: 2021/07/08 00:35:53 by jkhong           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-SRCS		=	srcs/pipex.c srcs/utils.c
-SRCS_BONUS	=	srcs/pipex_bonus.c
+SRCS		=	srcs/pipex.c		srcs/utils.c
+SRCS_BONUS	=	srcs/pipex_bonus.c	srcs/utils.c
 OBJS		=	${SRCS:.c=.o}
 OBJS_BONUS	=	${SRCS_BONUS:.c=.o}
 HEADER		=	-I ./includes -I ./libft/includes
 LIB			=	-L ./libft	-l ft
 CC			=	gcc
-CFLAGS		=	# -Wall -Wextra -Werror
+CFLAGS		=	-Wall -Wextra -Werror
 NAME		=	pipex
 
 %.o: %.c

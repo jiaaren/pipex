@@ -6,11 +6,10 @@
 /*   By: jkhong <jkhong@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/07 23:47:53 by jkhong            #+#    #+#             */
-/*   Updated: 2021/07/08 00:20:47 by jkhong           ###   ########.fr       */
+/*   Updated: 2021/07/08 00:32:49 by jkhong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include <stdio.h>
 #include "libft.h"
 
 static char	*ft_strjoin2(char const *s1, char const *s2)
@@ -45,7 +44,7 @@ static char	*ft_strjoin2(char const *s1, char const *s2)
 char	**split_path(char *envp[])
 {
 	int	i;
-	
+
 	i = 0;
 	while (envp[i])
 	{
@@ -78,7 +77,7 @@ char	**make_path(char **path_envp, char *cmd)
 
 int	exec_cmd(char *args[], char *paths[])
 {
-	int i;
+	int	i;
 
 	i = 0;
 	while (paths[i])
@@ -88,28 +87,3 @@ int	exec_cmd(char *args[], char *paths[])
 	}
 	return (-42);
 }
-
-// int main(int argc, char *argv[], char *envp[])
-// {
-// 	char *args[] = 
-// 	{
-// 		"cat",
-// 		"-l",
-// 		NULL
-// 	};
-
-// 	char **tmp;
-// 	tmp = split_path(envp);
-
-// 	for (int i = 0; tmp[i]; i++)
-// 		printf("%s\n", tmp[i]);
-	
-// 	char **paths;
-// 	paths = make_path(tmp, args[0]);
-	
-// 	for (int i = 0; paths[i]; i++)
-// 		printf("%s\n", paths[i]);
-	
-// 	printf("%i\n", exec_cmd(args, paths));
-// 	return (0);
-// }
