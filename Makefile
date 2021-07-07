@@ -6,11 +6,11 @@
 #    By: jkhong <jkhong@student.42kl.edu.my>        +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/07/06 15:42:02 by jkhong            #+#    #+#              #
-#    Updated: 2021/07/06 16:02:14 by jkhong           ###   ########.fr        #
+#    Updated: 2021/07/07 20:16:03 by jkhong           ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
-SRCS		=	$(wildcard ./srcs/*.c)
+SRCS		=	srcs/pipex.c	srcs/utils.c
 OBJS		=	${SRCS:.c=.o}
 HEADER		=	-I ./includes -I ./libft/includes
 LIB			=	-L ./libft	-l ft
