@@ -6,7 +6,7 @@
 /*   By: jkhong <jkhong@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/06 15:42:11 by jkhong            #+#    #+#             */
-/*   Updated: 2021/07/06 19:26:31 by jkhong           ###   ########.fr       */
+/*   Updated: 2021/07/07 21:07:21 by jkhong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,12 +24,7 @@
 // perror & strerror
 # include <errno.h>
 # include <string.h>
-
-// to remove
-# include <stdio.h>
-
+// utils
 # include "libft.h" 
-
-void	free_split(char **tmp_char);
 
 #endif

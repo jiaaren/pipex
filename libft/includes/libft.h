@@ -6,7 +6,7 @@
 /*   By: jkhong <jkhong@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/30 11:17:06 by jkhong            #+#    #+#             */
-/*   Updated: 2021/06/09 23:22:37 by jkhong           ###   ########.fr       */
+/*   Updated: 2021/07/07 21:05:21 by jkhong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -67,5 +67,6 @@ void	ft_lstclear(t_list **lst, void (*del)(void *));
 void	ft_lstiter(t_list *lst, void (*f)(void *));
 t_list	*ft_lstmap(t_list *lst, void *(*f)(void *), void (*del)(void *));
 int		get_next_line(int fd, char **line);
+void	ft_freesplit(char **tmp_char);
 
 #endif
