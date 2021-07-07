@@ -6,7 +6,7 @@
 /*   By: jkhong <jkhong@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/06 15:42:06 by jkhong            #+#    #+#             */
-/*   Updated: 2021/07/07 21:28:27 by jkhong           ###   ########.fr       */
+/*   Updated: 2021/07/07 21:34:54 by jkhong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ void	read_file(char *filename, int dup_fd[2])
 	close(fd);
 }
 
-int	process_child(char *argv[], int dup_fd_r[2], int dup_fd_w[0], int count)
+int	process_child(char *argv[], char *envp[], int dup_fd_r[2], int dup_fd_w[0], int count)
 {
 	char	**args;
 	char	*path;
@@ -68,7 +68,7 @@ int	process_child(char *argv[], int dup_fd_r[2], int dup_fd_w[0], int count)
 		dup2(dup_fd_r[0], STDIN_FILENO);
 		close(dup_fd_r[0]);
 		close(dup_fd_w[1]);
-		execve(path, args, __environ);
+		execve(path, args, envp);
 		ft_putstr_fd(args[0], 2);
 		ft_putstr_fd(": command not found\n", 2);
 		exit(127);
@@ -78,7 +78,7 @@ int	process_child(char *argv[], int dup_fd_r[2], int dup_fd_w[0], int count)
 	return (pid);
 }
 
-int	cycle_cmd(int argc, char *argv[], int dup_fd_r[2], int dup_fd_w[2])
+int	cycle_cmd(int argc, char *argv[], char *envp[], int dup_fd_r[2], int dup_fd_w[2])
 {
 	int		i;
 	int		tmp_fd;
@@ -94,7 +94,7 @@ int	cycle_cmd(int argc, char *argv[], int dup_fd_r[2], int dup_fd_w[2])
 			dup2(tmp_fd, dup_fd_r[0]);
 			close(tmp_fd);
 		}
-		pid = process_child(argv, dup_fd_r, dup_fd_w, i);
+		pid = process_child(argv, envp, dup_fd_r, dup_fd_w, i);
 		close(dup_fd_r[1]);
 		close(dup_fd_r[0]);
 		close(dup_fd_w[1]);
@@ -106,7 +106,7 @@ int	cycle_cmd(int argc, char *argv[], int dup_fd_r[2], int dup_fd_w[2])
 	return (tmp_fd);
 }
 
-int	main(int argc, char *argv[])
+int	main(int argc, char *argv[], char *envp[])
 {
 	int		dup_fd_r[2];
 	int		dup_fd_w[2];
@@ -120,7 +120,7 @@ int	main(int argc, char *argv[])
 	pipe(dup_fd_r);
 	pipe(dup_fd_w);
 	read_file(argv[1], dup_fd_r);
-	tmp_fd = cycle_cmd(argc, argv, dup_fd_r, dup_fd_w);
+	tmp_fd = cycle_cmd(argc, argv, envp, dup_fd_r, dup_fd_w);
 	if (write_file(argv[argc - 1], tmp_fd) == -1)
 		close(tmp_fd);
 	close(tmp_fd);
