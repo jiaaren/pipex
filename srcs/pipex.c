@@ -6,7 +6,7 @@
 /*   By: jkhong <jkhong@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/06 15:42:06 by jkhong            #+#    #+#             */
-/*   Updated: 2021/07/06 21:27:09 by jkhong           ###   ########.fr       */
+/*   Updated: 2021/07/07 12:41:35 by jkhong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -22,6 +22,7 @@
 		b1. implement redirection from file first
 		b. incorporate redirection
 		c. consider error handling
+		d. valgrind - Warning: invalid file descriptor -1 in syscall close()
 */
 
 /*
@@ -52,12 +53,14 @@ void	output_file(int fd)
 		write(1, &c, 1); // 1 is write
 }
 
+// wipe out file if there is one
+// include error checking for file, e.g. file name too long
 void	write_file(char *filename, int fd)
 {
 	int		new_file;
 	char	c;
-
-	new_file = open(filename, O_CREAT | O_WRONLY | O_APPEND, 0777); // append for bonus
+	// need O_TRUNC to reset file to zero
+	new_file = open(filename, O_CREAT | O_WRONLY | O_TRUNC, 0777); // append for bonus
 	while (read(fd, &c, 1) > 0)
 		write(new_file, &c, 1);
 }
@@ -67,6 +70,15 @@ int	read_file(char *filename, int dup_fd[2])
 	int		fd;
 	// initialising fd, closing the pipe and duplicating it to dup_fd via writing into [1]
 	fd = open(filename, O_RDONLY);
+	if (fd == -1)
+	{
+		ft_putstr_fd("pipex: ", 2);
+		ft_putstr_fd(filename, 2);
+		ft_putstr_fd(": ", 2);
+		ft_putstr_fd(strerror(errno), 2);
+		ft_putchar_fd('\n', 2);
+		return (-1);
+	}
 	// only can dup2 if fd is within range, need to initialise it properly before, i.e. using pipe, cannot just declare an integer and duplicate it afterwards
 	dup2(fd, dup_fd[0]);
 	close(fd);
@@ -88,11 +100,13 @@ int	main(int argc, char *argv[])
 	int		dup_fd_r[2];
 	int		dup_fd_w[2];
 
+	if (argc < 5)
+		return (1);
 	// forgot to pipe it previously
 	pipe(dup_fd_r);
 	pipe(dup_fd_w);
-	read_file(argv[1], dup_fd_r);
-
+	if (read_file(argv[1], dup_fd_r) == -1)
+		return (2);
 	i = 2; // 2 i.e. index of the first shell command
 	while (i < argc - 1) // -1 to consider last file as filename
 	{
@@ -101,6 +115,8 @@ int	main(int argc, char *argv[])
 			pipe(dup_fd_r);
 			pipe(dup_fd_w);
 			dup2(tmp_fd, dup_fd_r[0]);
+			// close after transferring to dup_fd_r[0]
+			close(tmp_fd);
 		}
 		args = ft_split(argv[i], ' ');
 		path = ft_strjoin("/bin/", args[0]);
@@ -117,12 +133,14 @@ int	main(int argc, char *argv[])
 			close(dup_fd_r[0]);
 			close(dup_fd_w[1]);
 			execve(path, args, NULL);
+			ft_putstr_fd(args[0], 2);
+			ft_putstr_fd(": command not found\n", 2);
+			
 			// after execve, program will just stop
-			return (0);
+			return (3);
 		}
 		// close unused
 		close(dup_fd_r[1]);
-		// close(dup_fd_w[0]);
 		// used
 		close(dup_fd_r[0]);
 		close(dup_fd_w[1]);
@@ -133,6 +151,8 @@ int	main(int argc, char *argv[])
 		// if waitpid is not added, the sequence of runs will be off, i.e. the data will be freed before all executions
 		// We can also actually just use wait() instead, since we are only dealing with 1 fork at a single time
 		// waitpid helps if there are multiple forks running at the same time, where sequencing is important for us.		
+
+		// if one child process fails, no need to terminat the remainder, continue executing
 		waitpid(pid, NULL, 0);
 		free_split(args);
 		free(path);
