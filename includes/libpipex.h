@@ -6,7 +6,7 @@
 /*   By: jkhong <jkhong@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/06 15:42:11 by jkhong            #+#    #+#             */
-/*   Updated: 2021/07/07 21:07:21 by jkhong           ###   ########.fr       */
+/*   Updated: 2021/07/08 00:21:39 by jkhong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,5 +26,12 @@
 # include <string.h>
 // utils
 # include "libft.h" 
+
+// to remove
+# include <stdio.h>
+
+char	**split_path(char *envp[]);
+char	**make_path(char **path_envp, char *cmd);
+int     exec_cmd(char *args[], char *paths[]);
 
 #endif
