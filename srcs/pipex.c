@@ -6,7 +6,7 @@
 /*   By: jkhong <jkhong@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/06 15:42:06 by jkhong            #+#    #+#             */
-/*   Updated: 2021/07/07 12:41:35 by jkhong           ###   ########.fr       */
+/*   Updated: 2021/07/07 13:58:26 by jkhong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,16 +53,48 @@ void	output_file(int fd)
 		write(1, &c, 1); // 1 is write
 }
 
-// wipe out file if there is one
-// include error checking for file, e.g. file name too long
-void	write_file(char *filename, int fd)
+int	write_empty(char *filename)
 {
 	int		new_file;
 	char	c;
 	// need O_TRUNC to reset file to zero
 	new_file = open(filename, O_CREAT | O_WRONLY | O_TRUNC, 0777); // append for bonus
+	if (new_file == -1)
+	{
+		// duplicate can dump it into another function
+		ft_putstr_fd("pipex: ", 2);
+		ft_putstr_fd(filename, 2);
+		ft_putstr_fd(": ", 2);
+		ft_putstr_fd(strerror(errno), 2);
+		ft_putchar_fd('\n', 2);
+		return (-1);
+	}
+	close(new_file);
+	return (0);
+}
+
+// wipe out file if there is one
+// include error checking for file, e.g. file name too long
+int	write_file(char *filename, int fd)
+{
+	int		new_file;
+	char	c;
+	// need O_TRUNC to reset file to zero
+	new_file = open(filename, O_CREAT | O_WRONLY | O_TRUNC, 0777); // append for bonus
+	if (new_file == -1)
+	{
+		// duplicate can dump it into another function
+		ft_putstr_fd("pipex: ", 2);
+		ft_putstr_fd(filename, 2);
+		ft_putstr_fd(": ", 2);
+		ft_putstr_fd(strerror(errno), 2);
+		ft_putchar_fd('\n', 2);
+		return (-1);
+	}
 	while (read(fd, &c, 1) > 0)
 		write(new_file, &c, 1);
+	close(new_file);
+	return (0);
 }
 
 int	read_file(char *filename, int dup_fd[2])
@@ -90,6 +122,11 @@ int	read_file(char *filename, int dup_fd[2])
 
 // version 1 - to process shell commands one after another
 // e.g. ./pipex "ls -l" "ls -l"
+/*
+	Handle error
+	< hello 3 | 4 > 6
+	./pipex hello 3 4 5
+*/
 int	main(int argc, char *argv[])
 {
 	int		i;
@@ -100,13 +137,22 @@ int	main(int argc, char *argv[])
 	int		dup_fd_r[2];
 	int		dup_fd_w[2];
 
+	int		status;
+	int		wexitstatus;
+
 	if (argc < 5)
+	{
+		ft_putstr_fd("./pipex [file1] [cmd1] [cmd2] ... [cmdn] [file2]\n", 2);
 		return (1);
+	}
 	// forgot to pipe it previously
 	pipe(dup_fd_r);
 	pipe(dup_fd_w);
 	if (read_file(argv[1], dup_fd_r) == -1)
-		return (2);
+	{
+		write_empty(argv[argc - 1]);
+		// removed return
+	}
 	i = 2; // 2 i.e. index of the first shell command
 	while (i < argc - 1) // -1 to consider last file as filename
 	{
@@ -137,7 +183,8 @@ int	main(int argc, char *argv[])
 			ft_putstr_fd(": command not found\n", 2);
 			
 			// after execve, program will just stop
-			return (3);
+			// return value 127 for command not found
+			return (127);
 		}
 		// close unused
 		close(dup_fd_r[1]);
@@ -153,7 +200,8 @@ int	main(int argc, char *argv[])
 		// waitpid helps if there are multiple forks running at the same time, where sequencing is important for us.		
 
 		// if one child process fails, no need to terminat the remainder, continue executing
-		waitpid(pid, NULL, 0);
+		waitpid(pid, &status, 0);
+		wexitstatus = WEXITSTATUS(status);
 		free_split(args);
 		free(path);
 		i++;
@@ -161,12 +209,15 @@ int	main(int argc, char *argv[])
 	// be aware of how often we call write or read, the file pointer will always move and we need to pay close attention.
 	// output_file(tmp_fd); 
 	// write to file
-	write_file(argv[argc - 1], tmp_fd);
+	if (write_file(argv[argc - 1], tmp_fd) == -1)
+	{
+		close(tmp_fd);
+	}
 	close(tmp_fd);
 	// char c;
 	// while (read(dup_fd[0], &c, 1) > 0)
 	// 	write(1, &c, 1); // 1 is write
-	return (0);
+	return (wexitstatus);
 }
 
 // we can close fd and the file?
