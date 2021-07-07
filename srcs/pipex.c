@@ -6,7 +6,7 @@
 /*   By: jkhong <jkhong@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/06 15:42:06 by jkhong            #+#    #+#             */
-/*   Updated: 2021/07/07 20:22:07 by jkhong           ###   ########.fr       */
+/*   Updated: 2021/07/07 20:41:15 by jkhong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,27 +76,16 @@ int	read_file(char *filename, int dup_fd[2])
 	return (0);
 }
 
-int	main(int argc, char *argv[])
+int	cycle_cmd(int argc, char *argv[], int dup_fd_r[2], int dup_fd_w[2])
 {
 	int		i;
-	int		pid;
 	char	**args;
 	char	*path;
 	int		tmp_fd;
-	int		dup_fd_r[2];
-	int		dup_fd_w[2];
+	int		pid;
 	int		status;
 	int		wexitstatus;
 
-	if (argc < 5)
-	{
-		ft_putstr_fd("./pipex [file1] [cmd1] [cmd2] ... [cmdn] [file2]\n", 2);
-		return (1);
-	}
-	pipe(dup_fd_r);
-	pipe(dup_fd_w);
-	if (read_file(argv[1], dup_fd_r) == -1)
-		write_empty(argv[argc - 1]);
 	i = 2;
 	while (i < argc - 1)
 	{
@@ -134,8 +123,27 @@ int	main(int argc, char *argv[])
 		free(path);
 		i++;
 	}
+	return (tmp_fd);
+}
+
+int	main(int argc, char *argv[])
+{
+	int		dup_fd_r[2];
+	int		dup_fd_w[2];
+	int		tmp_fd;
+
+	if (argc < 5)
+	{
+		ft_putstr_fd("./pipex [file1] [cmd1] [cmd2] ... [cmdn] [file2]\n", 2);
+		return (1);
+	}
+	pipe(dup_fd_r);
+	pipe(dup_fd_w);
+	if (read_file(argv[1], dup_fd_r) == -1)
+		write_empty(argv[argc - 1]);
+	tmp_fd = cycle_cmd(argc, argv, dup_fd_r, dup_fd_w);
 	if (write_file(argv[argc - 1], tmp_fd) == -1)
 		close(tmp_fd);
 	close(tmp_fd);
-	return (wexitstatus);
+	return (0);
 }
