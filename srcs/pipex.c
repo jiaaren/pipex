@@ -6,7 +6,7 @@
 /*   By: jkhong <jkhong@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/06 15:42:06 by jkhong            #+#    #+#             */
-/*   Updated: 2021/07/07 21:09:34 by jkhong           ###   ########.fr       */
+/*   Updated: 2021/07/07 22:56:04 by jkhong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -59,6 +59,8 @@ int	process_child(char *argv[], int dup_fd_r[2], int dup_fd_w[0], int count)
 
 	args = ft_split(argv[count], ' ');
 	path = ft_strjoin("/bin/", args[0]);
+	free(args[0]);
+	args[0] = path;
 	pid = fork();
 	if (pid == 0)
 	{
@@ -74,7 +76,6 @@ int	process_child(char *argv[], int dup_fd_r[2], int dup_fd_w[0], int count)
 		exit(127);
 	}
 	ft_freesplit(args);
-	free(path);
 	return (pid);
 }
 
