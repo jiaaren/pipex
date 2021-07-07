@@ -6,7 +6,7 @@
 /*   By: jkhong <jkhong@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/06 15:42:06 by jkhong            #+#    #+#             */
-/*   Updated: 2021/07/07 22:56:04 by jkhong           ###   ########.fr       */
+/*   Updated: 2021/07/07 23:43:26 by jkhong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -51,7 +51,7 @@ void	read_file(char *filename, int dup_fd[2])
 	close(fd);
 }
 
-int	process_child(char *argv[], int dup_fd_r[2], int dup_fd_w[0], int count)
+int	process_child(char *argv[], int dup_fd_r[2], int dup_fd_w[2], int count)
 {
 	char	**args;
 	char	*path;

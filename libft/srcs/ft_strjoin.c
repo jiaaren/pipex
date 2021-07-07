@@ -6,7 +6,7 @@
 /*   By: jkhong <jkhong@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/04/30 18:13:36 by jkhong            #+#    #+#             */
-/*   Updated: 2021/04/30 18:38:29 by jkhong           ###   ########.fr       */
+/*   Updated: 2021/07/07 23:58:07 by jkhong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -27,14 +27,12 @@ char	*ft_strjoin(char const *s1, char const *s2)
 	i = 0;
 	while (*s1)
 	{	
-		tmp[i] = *s1;
-		s1++;
+		tmp[i] = *s1++;
 		i++;
 	}
 	while (*s2)
 	{
-		tmp[i] = *s2;
-		s2++;
+		tmp[i] = *s2++;
 		i++;
 	}
 	tmp[i] = '\0';
