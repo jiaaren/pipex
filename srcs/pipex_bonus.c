@@ -6,7 +6,7 @@
 /*   By: jkhong <jkhong@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/06 15:42:06 by jkhong            #+#    #+#             */
-/*   Updated: 2021/07/08 00:35:35 by jkhong           ###   ########.fr       */
+/*   Updated: 2021/07/08 08:54:19 by jkhong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,21 +36,9 @@ int	write_file(char *filename, int fd)
 	return (0);
 }
 
-void	read_file(char *filename, int dup_fd[2])
+void	read_file(int dup_fd[2])
 {
-	int		fd;
-
-	fd = open(filename, O_RDONLY);
-	if (fd == -1)
-	{
-		ft_putstr_fd("pipex: ", 2);
-		ft_putstr_fd(filename, 2);
-		ft_putstr_fd(": ", 2);
-		ft_putstr_fd(strerror(errno), 2);
-		ft_putchar_fd('\n', 2);
-	}
-	dup2(fd, dup_fd[0]);
-	close(fd);
+	dup2(STDIN_FILENO, dup_fd[0]);
 }
 
 int	process_child(char *argv[], int dup_fd_r[2], int dup_fd_w[2], int count)
@@ -122,7 +110,7 @@ int	main(int argc, char *argv[], char *envp[])
 	g_path = split_path(envp);
 	pipe(dup_fd_r);
 	pipe(dup_fd_w);
-	read_file(argv[1], dup_fd_r);
+	read_file(dup_fd_r);
 	tmp_fd = cycle_cmd(argc, argv, dup_fd_r, dup_fd_w);
 	if (write_file(argv[argc - 1], tmp_fd) == -1)
 		close(tmp_fd);
