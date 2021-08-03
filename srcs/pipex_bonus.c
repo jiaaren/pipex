@@ -6,7 +6,7 @@
 /*   By: jkhong <jkhong@student.42kl.edu.my>        +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/07/06 15:42:06 by jkhong            #+#    #+#             */
-/*   Updated: 2021/07/08 08:54:19 by jkhong           ###   ########.fr       */
+/*   Updated: 2021/08/03 12:54:22 by jkhong           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -36,8 +36,28 @@ int	write_file(char *filename, int fd)
 	return (0);
 }
 
-void	read_file(int dup_fd[2])
+void	read_file(int dup_fd[2], char *heredoc)
 {
+	int		new_file;
+	char	*tmp_str;
+	int		index;
+
+	new_file = dup_fd[1];
+	index = get_next_line(STDIN_FILENO, &tmp_str);
+	while (index > 0)
+	{
+		if (ft_strncmp(heredoc, tmp_str, ft_strlen(heredoc)) == 0)
+			break ;
+		write(new_file, tmp_str, ft_strlen(tmp_str));
+		write(new_file, "\n", 1);
+		free(tmp_str);
+		index = get_next_line(STDIN_FILENO, &tmp_str);
+	}
+	free(tmp_str);
+	// close files so get_next_line clears static buffer
+	close(STDIN_FILENO);
+	close(new_file);
+	get_next_line(0, &tmp_str);
 	dup2(STDIN_FILENO, dup_fd[0]);
 }
 
@@ -110,7 +130,7 @@ int	main(int argc, char *argv[], char *envp[])
 	g_path = split_path(envp);
 	pipe(dup_fd_r);
 	pipe(dup_fd_w);
-	read_file(dup_fd_r);
+	read_file(dup_fd_r, argv[1]);
 	tmp_fd = cycle_cmd(argc, argv, dup_fd_r, dup_fd_w);
 	if (write_file(argv[argc - 1], tmp_fd) == -1)
 		close(tmp_fd);
